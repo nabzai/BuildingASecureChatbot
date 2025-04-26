@@ -1,0 +1,67 @@
+Comments on OWASP Top 10 GenAI (https://genai.owasp.org).
+LLM03:2025 Supply Chain
+
+Supply Chain attacks are largely out of scope of this excercise but are still relevant - we call external libraries
+like certifi and use command line commands like op to call one password and extract the OpenAI API key from 
+1Password - which is an external application. Copromise of any of these dependencies could introduce risks.
+
+
+1. General Protection
+SSL Library (via certifi):
+Helps validate certificate chains and prevent MITM attacks.
+If certifi is tampered with or replaced by a malicious CA bundle, attackers could intercept or forge traffic.
+
+
+2. External Services (1Password, OpenAI)
+Most issues under LLM03:2025 revolve around securing third-party dependencies using standard best practices:
+
+op CLI (1Password):
+Compromise/Tampering: A compromised op cli might exfiltrate the OpenAI API key when the script retrieves it.
+Permissions: If op cli has the wrong permissions or configuration, key retrieval can fail (bot won’t start) or credentials can leak.
+Configuration Files: Must be protected so malicious users or processes cannot alter or read them.
+Signing/Verification: Validate the op executable (e.g., via checksums or official signatures) to ensure authenticity.
+Zero Trust Approach: Limit trust boundaries and consider every component untrusted until verified.
+
+OpenAI Library:
+Dependency Tampering: Attackers might replace the local openai library with a compromised one.
+PyPI Compromise: If PyPI is compromised, the official package could be malicious. Always pin and verify versions.
+
+3. Code Signing
+Sign your code (e.g., .py files) to ensure integrity and authenticity:
+Generate Keys (using GPG):
+
+                gpg --full-generate-key
+                    (results in public and private keys)
+                        gpg: .gnupg/trustdb.gpg: trustdb created
+                        gpg: directory '.gnupg/openpgp-revocs.d' created
+                        gpg: revocation certificate stored as '.gnupg/openpgp-revocs.d/7CDD6D5E20936E5D0E852593853A673D15872994.rev'
+                        public and secret key created and signed.
+
+                        pub   ed25519 2025-03-15 [SC]
+                        7CDD6D5E20936E5D0E852593853A673D15872994
+
+
+                gpg --armor --output chatbot3.py.asc --detach-sig chatbot3.py
+                gpg --verify chatbot3.py.asc chatbot3.py
+Using Sigstore: Another option, but can be more complex (“pain in the ass”).
+Embed external signatures: If distributing your code publicly, include .asc files or a signature block so others can verify you as the author.
+
+
+4. Secure CI/CD Pipeline
+Tools: Dependabot, NexusIQ/Sonatype can help detect or block vulnerable versions.
+
+5. Pinning Dependencies - requirements.txt with pinned versions
+    Create a requirements.txt via:
+        pip freeze > requirements.txt
+        run a virtual environment:
+            python -m venv venv
+            source venv/bin/activate
+            pip install --requirements requirements.txt
+            ... run your chatbot
+Why Pin?
+    Helps avoid unexpected updates that might break security or functionality.
+    Minimizes risk from newly introduced vulnerabilities in untested versions.
+
+    certifi ensures valid SSL certificate chain - if it's tamperred with and replaced with malicious certificate bundle, MITM is possible
+    subprocess - can be exploited without proper input controls (in place from LLM02:2025)
+    logging - can log sensitive data (sanitized output being logged in this case)

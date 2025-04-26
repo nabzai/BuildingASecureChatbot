@@ -1,0 +1,28 @@
+Comments on OWASP Top 10 GenAI (https://genai.owasp.org).
+LLM04:2025 Data and Model Poisoning
+
+This version of the bot is not at risk of Data and Model Poisoning (no training or external sources)
+
+Current Implementation
+The script simply forwards user prompts to an external OpenAI model.
+It does not store the prompts or responses for training.
+No fine-tuning or offline model updates occur.
+
+Model Poisoning Risk
+    Not applicable here because the chatbot does not retrain on user data.
+    Poisoning requires feeding malicious content back into a model’s training (or embedding) pipeline, which is absent in this code.
+
+Potential Future Risks
+    Collecting Prompts/Responses for Fine-Tuning
+
+3rd-Party Data Sources
+    External plugins or APIs might provide compromised data that could contaminate the model during any future training or embedding updates.
+Logging
+    The bot only only the assistant’s responses for auditing purposes (could be security, QA etc).
+    Since logs are not reused for training, there is no immediate risk of poisoning from them.
+
+Distinction of LLM04:2025 vs. LLM01:2025
+LLM01 (Prompt Injection) focuses on the session-level manipulation, preventing malicious instructions to the model in real time.
+LLM04 (Data & Model Poisoning) concerns long-term corruption or tampering with the model itself, which does not apply to the current setup since no retraining occurs.
+
+

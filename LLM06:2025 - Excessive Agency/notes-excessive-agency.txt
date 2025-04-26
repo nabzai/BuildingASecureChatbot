@@ -1,0 +1,27 @@
+Comments on OWASP Top 10 GenAI (https://genai.owasp.org).
+LLM06:2025 Excessive Agency
+
+This bot has no autonomous "Agent" Capabilities - GPT3.5 is used and can only generate text responses
+The LLM can produce text but can not initiate any actions.
+The LLM has no delegated authority beyond generating text.
+
+subprocess.run is only used for 1password API key retrieval, LLM has no control over it.
+
+Manual interaction loop. no second level calls or letting the LLM chose what to do next
+no advanced tool usage functionality
+
+
+
+Excessive agency comes into play when:
+    LLM can run commands ex - capture output and pass it to subprocess.run() or any other system level calls - 
+    this would give the LLM the ability to execute code
+
+    LLM can run plugins (LangChain, LlamaIndex or any plugins that let the LLM read/write files, fetch URLs, 
+    or query Databases)
+        without proper permissions this could be destructive and result in unintended consequences
+
+
+    LLM Can expose Sensitive Data or Operations
+
+
+

@@ -1,0 +1,39 @@
+Comments on OWASP Top 10 GenAI (https://genai.owasp.org).
+LLM08:2025 - Vector Embedding Weakness
+
+
+A no use of vector embeddings or stores.
+code strictly uses client.chat.completions.create from LLM GPT3.5 turbo
+No storing or retrieval of user queries
+
+Some variables for consideration:
+
+What data is used to generate vector embeddings (public, proprietary, sensitive or other generated?)
+
+How are the embeddings created? (proprietary, open-source, third-party API ex OpenAI’s embeddings)?
+
+Are embeddings stored? If So where? How?
+
+Are there known biases or inaccuracies in the embedding model?
+
+Who has access to the embeddings?
+
+Are the embeddings shared with 3rd-parties?
+
+Are there controls to prevent un-authorized access to embedding data?
+
+Could embeddings leak sensitive data (ex PII?)
+
+Is there monitoring for Anomalous Embedding behavior?
+
+Are there safeguards against embedding-based attacks like prompt injection?
+
+How are embeddings used downstream? (search, recommendations, decision making)
+
+Do embeddings comply with GDPR, PIPL and other relevant privacy regulations?
+
+Is there an audit trail for embedding generation and usage?
+
+Have embeddings been tested for ethical risks?
+
+Who is responsible for monitoring and addressing Embedding based risks?

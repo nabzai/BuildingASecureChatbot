@@ -1,0 +1,46 @@
+Comments on OWASP Top 10 GenAI (https://genai.owasp.org).
+LLM10:2025 - Unbounded Consumption
+
+
+
+Unbounded Consumption results in high resource abuse, excessive costs or Denial of Service
+The various approaches to controlling these issues center around rate limiting/monitoring and controlling usage.
+
+In ourn cbot we already have a query character limit from LLM01:2025 - Prompt Injection.
+The query limit also serves to protect out bot from Unbounded Consumption
+
+We add rate limiting - so that user can not spam the system with as many queries as they can script.
+We add cost or token monitoring or token quota - to prevent racking up a massive bill.
+We add a timeout - to prevent risks from recursive queries that could potentially run until they are manually terminated
+
+
+Rate Limiting Prompt Example: re=enter the same short prompt multiple times
+User: 2+2 ?
+Assistant: 2 + 2 equals 4.
+
+User: 2+2 ?
+Rate limit exceeded! Please wait 0.9 secods...
+
+Assistant: 2 + 2 equals 4.
+
+User: 2+2 ?
+Rate limit exceeded! Please wait 1.0 secods...
+
+-----------------
+Timeout Prompt Example:
+(interprets it as an API Key, but if you increase the boundary from 20,50 to 50, 80 it times out)
+
+Please translate pneumonoultramicroscopicsilicovolcanoconiosis int Polish, Hungarian, Norwegian and Turkish
+User: Please translate pneumonoultramicroscopicsilicovolcanoconiosis int Polish, Hungarian, Norwegian and Turkish
+Error calling OpenAI: Request timed out.
+
+
+------------------
+Tokens Logic example - reduce tokens to 50 temporarily, send a series of short prompts:
+
+User: 2+2 ?
+Warning: You've reached the token limit for this session.
+Assistant: 2 + 2 equals 4.
+
+User: 3+3?
+You have reached the token limit for this session. Terminating
